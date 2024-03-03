@@ -4,7 +4,11 @@
     <h1 class="heading">👋 Welcome<br /><br /></h1>
     <p class="para">Sign in to continue!</p>
     <form [formGroup]="formData">
-      <ion-item lines="none" class="ion-item">
+      <ion-item
+        lines="none"
+        class="ion-item"
+        [ngClass]="{ 'invalid-field': email?.invalid && (email?.dirty || email?.touched) }"
+      >
         <fieldset class="input-item">
           <legend>Email Id</legend>
           <ion-input
@@ -14,7 +18,11 @@
           ></ion-input>
         </fieldset>
       </ion-item>
-      <ion-item lines="none" class="ion-item">
+      <ion-item
+        lines="none"
+        class="ion-item"
+        [ngClass]="{ 'invalid-field': password?.invalid && (password?.dirty || password?.touched) }"
+      >
         <fieldset class="input-item">
           <legend>Password</legend>
           <ion-input
@@ -45,7 +53,11 @@
     <h1 class="heading">🚀 Create Account<br /><br /></h1>
     <p class="para">Sign up to get started!</p>
     <form [formGroup]="formData">
-      <ion-item lines="none" class="ion-item">
+      <ion-item
+        lines="none"
+        class="ion-item"
+        [ngClass]="{ 'invalid-field': name?.invalid && (name?.dirty || name?.touched) }"
+      >
         <fieldset class="input-item">
           <legend>Full Name</legend>
           <ion-input
@@ -55,7 +67,11 @@
           ></ion-input>
         </fieldset>
       </ion-item>
-      <ion-item lines="none" class="ion-item">
+      <ion-item
+        lines="none"
+        class="ion-item"
+        [ngClass]="{ 'invalid-field': email?.invalid && (email?.dirty || email?.touched) }"
+      >
         <fieldset class="input-item">
           <legend>Email Id</legend>
           <ion-input
@@ -65,7 +81,11 @@
           ></ion-input>
         </fieldset>
       </ion-item>
-      <ion-item lines="none" class="ion-item">
+      <ion-item
+        lines="none"
+        class="ion-item"
+        [ngClass]="{ 'invalid-field': password?.invalid && (password?.dirty || password?.touched) }"
+      >
         <fieldset class="input-item">
           <legend>Password</legend>
           <ion-input
