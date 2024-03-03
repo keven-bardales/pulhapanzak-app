@@ -68,7 +68,7 @@ export default class LoginPage implements OnInit {
     }
 
     this.authService
-      .Login(email, password)
+      .login(email, password)
       .pipe(take(1))
       .subscribe({
         next: (value) => {

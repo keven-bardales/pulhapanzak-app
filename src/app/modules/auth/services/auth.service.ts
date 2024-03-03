@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  sendPasswordResetEmail, // Importamos la función sendPasswordResetEmail de AngularFireAuth
 } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
 
@@ -35,13 +36,18 @@ export class AuthService {
     return from(promise);
   }
 
-  Login(email: string, password: string) {
+  login(email: string, password: string): Observable<void> {
     const promise = signInWithEmailAndPassword(
       this.fireBaseAuth,
       email,
       password
     ).then((response) => {});
 
+    return from(promise);
+  }
+
+  forgotPassword(email: string): Observable<void> {
+    const promise = sendPasswordResetEmail(this.fireBaseAuth, email);
     return from(promise);
   }
 }
