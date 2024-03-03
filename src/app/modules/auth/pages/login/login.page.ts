@@ -53,7 +53,7 @@ export default class LoginPage implements OnInit {
   }
 
   change(value: string) {
-    this.screen = 'register';
+    this.router.navigate(['/register']);
   }
 
   login() {
