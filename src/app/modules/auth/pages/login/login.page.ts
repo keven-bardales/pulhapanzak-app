@@ -11,6 +11,7 @@ import {
   IonItem,
   IonTitle,
   IonToolbar,
+  IonText,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 import { take } from 'rxjs';
@@ -77,7 +78,9 @@ export default class LoginPage implements OnInit {
       });
   }
 
-  register() {}
+  register() {
+    this.router.navigate(['/register']);
+  }
 
   get name() {
     return this.formData.get('name');
@@ -87,5 +90,24 @@ export default class LoginPage implements OnInit {
   }
   get password() {
     return this.formData.get('password');
+  }
+
+  get emailErrors() {
+    const emailControl = this.formData.get('email');
+    if (this.email?.errors?.['required']) {
+      return 'Email is required';
+    }
+    if (this.email?.errors?.['email']) {
+      return 'Invalid email format';
+    }
+    return '';
+  }
+
+  get passwordErrors() {
+    const passwordControl = this.formData.get('password');
+    if (passwordControl?.errors?.['required']) {
+      return 'Password is required';
+    }
+    return '';
   }
 }
