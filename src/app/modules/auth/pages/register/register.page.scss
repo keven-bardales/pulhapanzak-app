@@ -4,54 +4,54 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+  }
   
-    .heading {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
+  .heading {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
   
-    .para {
-      font-size: 18px;
-      margin-bottom: 40px;
-      color: #666;
-    }
+  .para {
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: #666;
+  }
   
-    .ion-item {
-      width: 80%;
-      margin-bottom: 20px;
+  .ion-item {
+    width: 80%;
+    margin-bottom: 20px;
+  }
   
-      .input-item {
-        border-radius: 12px;
-        border: 2px solid #ccc;
-        padding: 10px;
-        position: relative;
+  .input-item {
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    padding: 10px;
+    position: relative;
+  }
   
-        legend {
-          position: absolute;
-          top: -10px;
-          left: 15px;
-          background-color: white;
-          padding: 0 5px;
-          font-size: 14px;
-          color: #666;
-        }
+  .legend {
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 14px;
+    color: #666;
+  }
   
-        ion-input {
-          margin-top: 10px;
-        }
-      }
+  ion-input {
+    margin-top: 10px;
+  }
   
-      .error-message {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-      }
-    }
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+  }
   
-    .register-button {
-      width: 80%;
-      margin-top: 20px;
-    }
+  .register-button {
+    width: 80%;
+    margin-top: 20px;
   }
   
