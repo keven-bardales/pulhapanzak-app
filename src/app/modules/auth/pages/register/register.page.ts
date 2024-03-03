@@ -11,6 +11,7 @@ import {
   IonContent,
   IonInput,
   IonItem,
+  IonLabel,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 
@@ -26,6 +27,7 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     ReactiveFormsModule,
     IonContent,
+    IonLabel,
   ],
 })
 export class RegistroComponent implements OnInit {
