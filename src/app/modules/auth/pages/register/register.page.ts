@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,8 +12,10 @@ import {
   IonInput,
   IonItem,
   IonLabel,
+  IonToast,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registro',
@@ -28,10 +30,16 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     IonContent,
     IonLabel,
+    IonToast,
   ],
 })
 export class RegistroComponent implements OnInit {
   formData: FormGroup = new FormGroup({});
+  isToastOpen: boolean = false;
+  toastMessage: string = '';
+  alertColor: string = 'green';
+
+  router = inject(Router);
 
   constructor(
     private formBuilder: FormBuilder,
@@ -54,18 +62,31 @@ export class RegistroComponent implements OnInit {
     const { username, email, password } = this.formData.value;
 
     // Llama al método de registro del servicio AuthService pasando los datos del formulario
-    this.authService.register(username, email, password).subscribe({
+    this.authService.register(email, username, password).subscribe({
       next: (response) => {
         // Maneja la respuesta del servicio después del registro exitoso
-        console.log('Registro exitoso', response);
-        // Aquí puedes redirigir a la página de inicio de sesión u otra página
+
+        this.setOpenToast(true, 'Registro exitoso', 'green');
+
+        this.router.navigate(['/login']);
       },
       error: (error) => {
         // Maneja el error en caso de que falle el registro
         console.error('Error en el registro', error);
+        this.setOpenToast(true, error.message, 'red');
         // Puedes mostrar un mensaje de error al usuario si lo deseas
       },
     });
+  }
+
+  setOpenToast(value: boolean, message: string, alertColor: string) {
+    this.isToastOpen = value;
+    this.toastMessage = message;
+    this.alertColor = alertColor;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 5000);
   }
 
   // Getters para acceder fácilmente a los campos del formulario

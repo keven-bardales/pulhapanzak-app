@@ -17,4 +17,13 @@ export const routes: Routes = [
         (m) => m.RegistroComponent
       ),
   },
+  {
+    path: 'home',
+    loadComponent: () => import('./modules/home/pages/home/home.page'),
+  },
+  {
+    path: 'profile-page',
+    loadComponent: () =>
+      import('./modules/user/pages/profile-page/profile-page.page'),
+  },
 ];

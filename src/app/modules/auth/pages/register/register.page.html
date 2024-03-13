@@ -27,7 +27,7 @@
         class="ion-item"
         [ngClass]="{ 'invalid-field': email?.invalid && (email?.dirty || email?.touched) }"
       >
-        <ion-label position="stacked">Email Id</ion-label>
+        <ion-label position="stacked">Email</ion-label>
         <ion-input
           formControlName="email"
           type="email"
@@ -70,5 +70,12 @@
         >Sign Up</ion-button
       >
     </form>
+    <ion-toast
+      [style.color]="alertColor"
+      [isOpen]="isToastOpen"
+      [message]="toastMessage"
+      [duration]="5000"
+      (didDismiss)="setOpenToast(false, '', 'green')"
+    ></ion-toast>
   </div>
 </ion-content>
