@@ -20,7 +20,12 @@
         Esta es una página de inicio simple. Puedes navegar a la página de
         perfil haciendo clic en el siguiente enlace:
       </p>
-      <ion-button expand="block" routerLink="/profile-page">Perfil</ion-button>
+      <ion-button
+        (click)="goToProfile()"
+        expand="block"
+        routerLink="/profile-page"
+        >Perfil</ion-button
+      >
     </ion-card-content>
   </ion-card>
 </ion-content>
