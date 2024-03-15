@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  sendPasswordResetEmail, // Importamos la función sendPasswordResetEmail de AngularFireAuth
+  sendPasswordResetEmail,
+  User,
 } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
 
@@ -13,7 +13,6 @@ import { Observable, from } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private httpClient = inject(HttpClient);
   private fireBaseAuth = inject(Auth);
 
   constructor() {}
@@ -49,5 +48,31 @@ export class AuthService {
   forgotPassword(email: string): Observable<void> {
     const promise = sendPasswordResetEmail(this.fireBaseAuth, email);
     return from(promise);
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return new Observable<boolean>((observer) => {
+      this.fireBaseAuth.onAuthStateChanged((user) => {
+        observer.next(!!user);
+      });
+    });
+  }
+
+  async getUserLogged(): Promise<User | null> {
+    try {
+      const userCredential = await this.fireBaseAuth.currentUser;
+      return userCredential ? userCredential : null;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+  }
+
+  async updateUser(user: User): Promise<void> {
+    try {
+      await updateProfile(user, { displayName: user.displayName });
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
   }
 }

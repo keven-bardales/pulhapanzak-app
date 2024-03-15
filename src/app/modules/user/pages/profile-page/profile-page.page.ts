@@ -1,29 +1,31 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Camera, CameraResultType } from '@capacitor/camera';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { AuthService } from 'src/app/modules/auth/services/auth.service';
+import { ProfileService } from '../../services/profile.service';
+import { UserDto } from 'src/app/interfaces/user/user.interface';
+import { maxDateValidator } from 'src/app/utils/validators/max-date.validator';
+import { ToastController } from '@ionic/angular';
 import {
   IonButton,
   IonContent,
   IonHeader,
   IonIcon,
-  IonTitle,
-  IonToolbar,
-  IonLabel,
+  IonImg,
   IonInput,
   IonItem,
-  IonDatetime,
-  IonToast,
-  ToastController,
-  IonImg,
+  IonLabel,
+  IonTitle,
+  IonToolbar,
 } from '@ionic/angular/standalone';
-import { AuthService } from 'src/app/modules/auth/services/auth.service';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user-profile',
@@ -31,133 +33,123 @@ import { Router } from '@angular/router';
   styleUrls: ['./profile-page.page.scss'],
   standalone: true,
   imports: [
-    IonImg,
-    CommonModule,
-    IonButton,
     IonContent,
-    IonDatetime,
-    IonHeader,
-    IonIcon,
-    IonInput,
-    IonImg,
-    IonItem,
     IonLabel,
-    IonTitle,
-    IonToast,
     IonToolbar,
+    IonHeader,
+    IonTitle,
+    IonItem,
+    IonImg,
+    IonInput,
+    FormsModule,
     ReactiveFormsModule,
+    IonIcon,
+    IonButton,
+    CommonModule,
   ],
 })
-export default class ProfilePage implements OnInit {
-  private authService = inject(AuthService);
-  private formBuilder = inject(FormBuilder);
-  // private profileService = inject(ProfileService);
-  private router = inject(Router);
-  private toastController = inject(ToastController);
-  imageSrc: string = 'assets/icon/user.svg';
-  user: any | null = null;
-  userForm: FormGroup = this.formBuilder.group({
-    name: ['', Validators.required],
-    birthdate: ['', [Validators.required]],
-    imageProfile: [''],
-    phoneNumber: ['', Validators.required],
-  });
+export default class UserProfilePage implements OnInit {
+  user: UserDto | null = null;
+  userForm: FormGroup;
+  imageSrc: string = ''; // Variable para almacenar la URL de la imagen de perfil
 
-  get isBirthdateInvalid(): boolean {
-    const control = this.userForm.get('birthdate');
-    return control ? control.hasError('invalidDate') : false;
+  constructor(
+    private authService: AuthService,
+    private profileService: ProfileService,
+    private router: Router,
+    private formBuilder: FormBuilder,
+    private toastController: ToastController
+  ) {
+    this.userForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      birthdate: ['', [Validators.required, maxDateValidator(new Date())]],
+      phoneNumber: ['', Validators.required],
+    });
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.getUserLogged();
+  }
+
+  async getUserLogged(): Promise<void> {
+    try {
+      this.user = (await this.authService.getUserLogged()) as any;
+      if (this.user) {
+        this.userForm.patchValue({
+          name: this.user.name,
+          phoneNumber: this.user.phoneNumber,
+          birthdate: this.user.birthdate,
+        });
+        this.imageSrc = this.user.imageProfile || ''; // Establecer la URL de la imagen de perfil si está disponible
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }
+
+  async onSubmit(): Promise<void> {
+    if (this.userForm.invalid || !this.user) {
+      return;
+    }
+
+    this.user.name = this.userForm.get('name')?.value;
+    this.user.phoneNumber = this.userForm.get('phoneNumber')?.value;
+    this.user.birthdate = this.userForm.get('birthdate')?.value as Date;
+
+    try {
+      const url = await this.profileService.uploadImage(
+        this.imageSrc,
+        this.user.uid
+      );
+      if (url) {
+        this.user.imageProfile = url;
+      }
+      await this.authService.updateUser(this.user as any);
+      await this.getUserLogged();
+      this.showToast('Usuario actualizado correctamente');
+    } catch (error) {
+      this.showToast('Ha ocurrido un error al actualizar el usuario', true);
+    }
+  }
+
+  async pickImage(): Promise<void> {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri,
+      saveToGallery: true,
+      promptLabelHeader: 'Seleccionar una opción',
+      promptLabelPicture: 'Tomar una foto',
+      promptLabelPhoto: 'Elegir de galería',
+    });
+
+    if (!image) return;
+
+    this.imageSrc = image.webPath || image.path || '';
+  }
+
+  async showToast(message: string, isError: boolean = false): Promise<void> {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 5000,
+      position: 'bottom',
+      color: isError ? 'danger' : 'success',
+    });
+    await toast.present();
+  }
+
+  signOut(): void {
+    this.router.navigate(['/login']);
   }
 
   get isFormInvalid(): boolean {
     return this.userForm.invalid;
   }
 
-  getUserLoggued(): void {
-    // this.authService.getUserLoggued().then((user) => {
-    //   this.user = user;
-    //   this.imageSrc = user?.imageProfile ?? this.imageSrc;
-    //   this.userForm.patchValue({
-    //     name: user?.name,
-    //     phoneNumber: user?.phoneNumber,
-    //     imageProfile: user?.imageProfile,
-    //     birthdate: user?.birthdate,
-    //   });
-    // });
-  }
-
-  ngOnInit(): void {
-    this.getUserLoggued();
-  }
-
-  onSubmit(): void {
-    if (!this.isFormInvalid && this.user) {
-      this.user.name = this.userForm?.get('name')?.value;
-      this.user.phoneNumber = this.userForm?.get('phoneNumber')?.value;
-      this.user.birthdate = this.userForm?.get('birthdate')?.value as Date;
-      // this.profileService
-      //   .uploadImage(this.imageSrc, this.user?.uid ?? '')
-      //   .then((url) => {
-      //     if (url) {
-      //       if (this.user) this.user.imageProfile = url;
-      //     }
-      //     this.saveUser();
-      //   })
-      //   .catch(() => {
-      //     this.showAlert(
-      //       'Ha ocurrido un error al cambiar su imagen de perfil, vuelva a intentarlo',
-      //       true
-      //     );
-      //   });
-    }
-  }
-
-  async pickImage() {
-    // const image = await Camera.getPhoto({
-    //   quality: 90,
-    //   allowEditing: false,
-    //   resultType: CameraResultType.Uri,
-    //   saveToGallery: true,
-    //   promptLabelHeader: 'Seleccionar una opción',
-    //   promptLabelPicture: 'Tomar una foto',
-    //   promptLabelPhoto: 'Elegir de galería',
-    // });
-    // if (!image) return;
-    // this.imageSrc = image.webPath ?? image.path ?? '';
-  }
-
-  saveUser(): void {
-    // if (this.user) {
-    //   this.authService
-    //     .updateUser(this.user)
-    //     .then(() => {
-    //       this.getUserLoggued();
-    //       this.showAlert('Usuario actualizado correctamente');
-    //     })
-    //     .catch(() => {
-    //       this.showAlert('Ha ocurrido un error, vuelva a intentarlo', true);
-    //     });
-    // }
-  }
-
-  async showAlert(message: string, error: boolean = false): Promise<void> {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 5000,
-      position: 'bottom',
-      color: error ? 'danger' : 'success',
-    });
-    await toast.present();
-  }
-
-  signOut(): void {
-    // this.authService
-    //   .signOut()
-    //   .then(() => {
-    //     this.router.navigate(['/login']);
-    //     this.showAlert('Ha cerrado sesión correctamente');
-    //   })
-    //   .catch(() => {
-    //     this.showAlert('Ha ocurrido un error, vuelva a intentarlo', true);
-    //   });
+  get isBirthdateInvalid(): boolean {
+    return !!(
+      this.userForm.get('birthdate')?.invalid &&
+      this.userForm.get('birthdate')?.touched
+    );
   }
 }

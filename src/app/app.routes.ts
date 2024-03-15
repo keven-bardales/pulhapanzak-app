@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './modules/shared/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -25,5 +26,6 @@ export const routes: Routes = [
     path: 'profile-page',
     loadComponent: () =>
       import('./modules/user/pages/profile-page/profile-page.page'),
+    canActivate: [AuthGuard],
   },
 ];
