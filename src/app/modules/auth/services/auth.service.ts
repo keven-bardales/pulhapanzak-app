@@ -8,12 +8,24 @@ import {
   User,
 } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
+import {
+  Firestore,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
+import { UserDto } from 'src/app/interfaces/user/user.interface';
+
+const PATH = 'users';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private fireBaseAuth = inject(Auth);
+  private _firestore = inject(Firestore);
 
   constructor() {}
 
@@ -58,14 +70,27 @@ export class AuthService {
     });
   }
 
-  async getUserLogged(): Promise<User | null> {
+  async getUserLoggued() {
     try {
-      const userCredential = await this.fireBaseAuth.currentUser;
-      return userCredential ? userCredential : null;
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+      const user = await this.getCurrentUser();
+      const userDocument = doc(this._firestore, PATH, user?.uid ?? '');
+      const userSnapshot = await getDoc(userDocument);
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data() as UserDto;
+        return userData;
+      }
       return null;
+    } catch (error) {
+      throw error;
     }
+  }
+
+  private getCurrentUser(): Promise<User | null> {
+    return new Promise<User | null>((resolve) => {
+      this.fireBaseAuth.onAuthStateChanged((user) => {
+        resolve(user);
+      });
+    });
   }
 
   async updateUser(user: User): Promise<void> {
@@ -74,5 +99,13 @@ export class AuthService {
     } catch (error) {
       console.error('Error updating user:', error);
     }
+  }
+
+  async signOut() {
+    const user = await this.getCurrentUser();
+    if (user) {
+      return this.fireBaseAuth.signOut();
+    }
+    return Promise.reject('User not found');
   }
 }

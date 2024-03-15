@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType } from '@capacitor/camera';
 import {
@@ -49,67 +49,44 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export default class UserProfilePage implements OnInit {
-  user: UserDto | null = null;
   userForm: FormGroup;
-  imageSrc: string = ''; // Variable para almacenar la URL de la imagen de perfil
+  imageSrc: string = 'assets/icon/user.svg';
+  profileService = inject(ProfileService);
+  currentUser: UserDto | null = null;
 
   constructor(
-    private authService: AuthService,
-    private profileService: ProfileService,
-    private router: Router,
     private formBuilder: FormBuilder,
-    private toastController: ToastController
+    private authService: AuthService
   ) {
     this.userForm = this.formBuilder.group({
       name: ['', Validators.required],
-      birthdate: ['', [Validators.required, maxDateValidator(new Date())]],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern('^[0-9]*$'),
+        ],
+      ],
+      birthdate: ['', [Validators.required, this.validateBirthdate]],
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    await this.getUserLogged();
-  }
+  async ngOnInit() {
+    const currentUser = await this.authService.getUserLoggued();
 
-  async getUserLogged(): Promise<void> {
-    try {
-      this.user = (await this.authService.getUserLogged()) as any;
-      if (this.user) {
-        this.userForm.patchValue({
-          name: this.user.name,
-          phoneNumber: this.user.phoneNumber,
-          birthdate: this.user.birthdate,
-        });
-        this.imageSrc = this.user.imageProfile || ''; // Establecer la URL de la imagen de perfil si está disponible
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
+    this.currentUser = currentUser;
   }
 
   async onSubmit(): Promise<void> {
-    if (this.userForm.invalid || !this.user) {
+    if (this.userForm.invalid) {
       return;
     }
 
-    this.user.name = this.userForm.get('name')?.value;
-    this.user.phoneNumber = this.userForm.get('phoneNumber')?.value;
-    this.user.birthdate = this.userForm.get('birthdate')?.value as Date;
+    // Obtener los valores del formulario
+    const { name, phoneNumber, birthdate } = this.userForm.value;
 
-    try {
-      const url = await this.profileService.uploadImage(
-        this.imageSrc,
-        this.user.uid
-      );
-      if (url) {
-        this.user.imageProfile = url;
-      }
-      await this.authService.updateUser(this.user as any);
-      await this.getUserLogged();
-      this.showToast('Usuario actualizado correctamente');
-    } catch (error) {
-      this.showToast('Ha ocurrido un error al actualizar el usuario', true);
-    }
+    this.profileService.uploadImage(this.imageSrc, this.currentUser?.uid!);
   }
 
   async pickImage(): Promise<void> {
@@ -123,33 +100,38 @@ export default class UserProfilePage implements OnInit {
       promptLabelPhoto: 'Elegir de galería',
     });
 
-    if (!image) return;
+    if (!image || !image.webPath) {
+      return;
+    }
 
-    this.imageSrc = image.webPath || image.path || '';
+    this.imageSrc = image.webPath;
   }
 
-  async showToast(message: string, isError: boolean = false): Promise<void> {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 5000,
-      position: 'bottom',
-      color: isError ? 'danger' : 'success',
-    });
-    await toast.present();
+  async signOut(): Promise<void> {
+    try {
+      await this.authService.signOut();
+      // Redireccionar al usuario a la página de inicio de sesión
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   }
 
-  signOut(): void {
-    this.router.navigate(['/login']);
+  validateBirthdate(control: any): { [key: string]: any } | null {
+    const birthdate = new Date(control.value);
+    const currentDate = new Date();
+
+    if (birthdate > currentDate) {
+      return { invalidBirthdate: true };
+    }
+
+    return null;
+  }
+
+  get isBirthdateInvalid(): boolean {
+    return !!this.userForm.get('birthdate')?.invalid;
   }
 
   get isFormInvalid(): boolean {
     return this.userForm.invalid;
-  }
-
-  get isBirthdateInvalid(): boolean {
-    return !!(
-      this.userForm.get('birthdate')?.invalid &&
-      this.userForm.get('birthdate')?.touched
-    );
   }
 }
