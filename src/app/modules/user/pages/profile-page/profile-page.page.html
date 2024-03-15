@@ -3,6 +3,7 @@
     <ion-title>Mi Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
+
 <ion-content [fullscreen]="true">
   <div class="register-page_container">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
@@ -74,6 +75,10 @@
         src="assets/icon/logout.svg"
       ></ion-icon>
       Cerrar sesión
+    </ion-button>
+
+    <ion-button class="back-button" routerLink="/home" fill="clear">
+      <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
     </ion-button>
   </div>
 </ion-content>
