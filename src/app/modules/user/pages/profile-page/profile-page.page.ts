@@ -170,6 +170,10 @@ export default class UserProfilePage implements OnInit {
     return null;
   }
 
+  goHome(): void {
+    this.router.navigate(['/home']);
+  }
+
   get isBirthdateInvalid(): boolean {
     return !!this.userForm.get('birthdate')?.invalid;
   }

@@ -2,6 +2,16 @@
   <ion-toolbar>
     <ion-title>Mi Perfil</ion-title>
   </ion-toolbar>
+
+  <ion-button
+    (click)="goHome()"
+    class="back-button"
+    routerLink="/home"
+    fill="clear"
+  >
+    <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+    Volver
+  </ion-button>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -75,10 +85,6 @@
         src="assets/icon/logout.svg"
       ></ion-icon>
       Cerrar sesión
-    </ion-button>
-
-    <ion-button class="back-button" routerLink="/home" fill="clear">
-      <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
     </ion-button>
   </div>
 </ion-content>
