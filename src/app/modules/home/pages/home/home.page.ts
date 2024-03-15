@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -11,9 +12,15 @@ import { IonicModule } from '@ionic/angular';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export default class HomePage implements OnInit {
+  router = inject(Router);
+
   constructor() {}
 
   ngOnInit() {
     console.log('Home Page');
+  }
+
+  goToProfile() {
+    this.router.navigate(['profile-page']);
   }
 }
