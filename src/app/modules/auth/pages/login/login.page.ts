@@ -72,7 +72,7 @@ export default class LoginPage implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (value) => {
-          this.router.navigate(['/home']);
+          this.router.navigate(['tabs/home']);
         },
         error: (err) => {},
       });

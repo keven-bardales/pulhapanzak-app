@@ -2,18 +2,7 @@
   <ion-toolbar>
     <ion-title>Mi Perfil</ion-title>
   </ion-toolbar>
-
-  <ion-button
-    (click)="goHome()"
-    class="back-button"
-    routerLink="/home"
-    fill="clear"
-  >
-    <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
-    Volver
-  </ion-button>
 </ion-header>
-
 <ion-content [fullscreen]="true">
   <div class="register-page_container">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
@@ -24,7 +13,7 @@
           (click)="pickImage()"
         ></ion-img>
       </ion-item>
-      <ion-item [ngClass]="{ 'invalid-field': isNameInvalid }">
+      <ion-item>
         <ion-label class="register-page_mt">Nombre completo:</ion-label>
         <ion-input
           aria-label="name"
@@ -36,19 +25,19 @@
           ngDefaultControl
         ></ion-input>
       </ion-item>
-      <ion-item [ngClass]="{ 'invalid-field': isPhoneNumberInvalid }">
+      <ion-item>
         <ion-label class="register-page_mt">Teléfono:</ion-label>
         <ion-input
           aria-label="phoneNumber"
           class="register-page_input"
           name="phoneNumber"
-          type="tel"
+          type="number"
           placeholder="Ingrese su número de teléfono"
           formControlName="phoneNumber"
           ngDefaultControl
         ></ion-input>
       </ion-item>
-      <ion-item [ngClass]="{ 'invalid-field': isBirthdateInvalid }">
+      <ion-item>
         <ion-label class="register-page_mt">Fecha de nacimiento:</ion-label>
         <ion-input
           aria-label="birthdate"
@@ -69,9 +58,8 @@
         expand="block"
         type="submit"
         [disabled]="isFormInvalid"
+        >Guardar</ion-button
       >
-        Guardar
-      </ion-button>
     </form>
     <ion-button
       class="logOut-button"
@@ -84,7 +72,7 @@
         class="logOut-button-icon"
         src="assets/icon/logout.svg"
       ></ion-icon>
-      Cerrar sesión
-    </ion-button>
+      Cerrar sesión</ion-button
+    >
   </div>
 </ion-content>

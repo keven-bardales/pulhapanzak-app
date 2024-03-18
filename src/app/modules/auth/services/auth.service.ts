@@ -47,6 +47,11 @@ export class AuthService {
     return from(promise);
   }
 
+  async isUserLoggedIn() {
+    const user = await this.getCurrentUser();
+    return !!user;
+  }
+
   login(email: string, password: string): Observable<void> {
     const promise = signInWithEmailAndPassword(
       this.fireBaseAuth,
@@ -93,12 +98,11 @@ export class AuthService {
     });
   }
 
-  async updateUser(user: User): Promise<void> {
-    try {
-      await updateProfile(user, { displayName: user.displayName });
-    } catch (error) {
-      console.error('Error updating user:', error);
-    }
+  updateUser(user: UserDto): Promise<void> {
+    if (!user.uid) throw new Error('User must have a uid');
+
+    const userDocument = doc(this._firestore, PATH, user.uid);
+    return updateDoc(userDocument, { ...user });
   }
 
   async signOut() {

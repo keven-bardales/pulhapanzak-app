@@ -1,0 +1,37 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Galerías</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-button expand="block" (click)="createPost()">Crear Post</ion-button>
+  @for (item of characters; track item.id) {
+  <ion-card (click)="setOpen(true, item.id)">
+    <img class="gallery-page_img" [alt]="item.name" [src]="item.image" />
+    <ion-card-header>
+      <ion-card-title>{{item.name}}</ion-card-title>
+      <ion-card-subtitle>{{ item.species}} - {{item.gender}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Última ubicación conocida: {{ item.location.name }}
+    </ion-card-content>
+  </ion-card>
+  <ion-modal [isOpen]="isModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{character.name}}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <img class="gallery-page_img" [alt]="character.name" [src]="character.image" />
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  } @empty {
+  <span>No hay información disponible</span>
+  }
+</ion-content>

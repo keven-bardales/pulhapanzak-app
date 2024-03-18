@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './modules/shared/guards/auth.guard';
+import { AuthGuard } from './modules/auth/services/auth.guard';
+import { inject } from '@angular/core';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+    loadChildren: () =>
+      import('../app/modules/tabs/tabs.routes').then((m) => m.routes),
+    canActivate: [() => inject(AuthGuard).canActivate()],
   },
   {
     path: 'login',
@@ -19,13 +21,8 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'home',
-    loadComponent: () => import('./modules/home/pages/home/home.page'),
-  },
-  {
-    path: 'profile-page',
-    loadComponent: () =>
-      import('./modules/user/pages/profile-page/profile-page.page'),
-    canActivate: [AuthGuard],
+    path: '**',
+    redirectTo: 'login',
+    pathMatch: 'full',
   },
 ];
